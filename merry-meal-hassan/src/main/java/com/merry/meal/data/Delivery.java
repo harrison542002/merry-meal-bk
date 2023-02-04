@@ -1,8 +1,5 @@
 package com.merry.meal.data;
 
-import java.util.List;
-
-import javax.annotation.Generated;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,37 +8,38 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "meal")
+@Table(name = "delivery")
 @Getter
 @Setter
-public class Meal {
+@AllArgsConstructor
+@NoArgsConstructor
+public class Delivery {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "meal_id")
-	private Long mealId;
-	@Column(name = "meal_img")
-	private String image;
-	@Column(name = "status")
-	private String status;
-	@Column(name = "meal_name")
-	private String meal_name;
-	@Column(name = "meal_desc")
-	private String meal_desc;
-	@Column(name = "category")
-	private String category;
+	@Column(name = "delivery_id")
+	private Long delivery_id;
+	@Column(name = "delivery_number")
+	private Integer delivery_number;
+	@Column(name = "delivery_status")
+	private String delivery_status;
+	@Column(name = "delivery_address")
+	private String delivery_address;
 	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "user_id")
 	private User user;
-	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "meal")
-	private List<Delivery> delivery;
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+	@JoinColumn(name = "meal_id", referencedColumnName = "meal_id")
+	private Meal meal;
+	@OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "delivery")
+	private RideDelivery rideDelivery;
 }

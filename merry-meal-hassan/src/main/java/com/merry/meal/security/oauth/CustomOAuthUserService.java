@@ -104,6 +104,7 @@ public class CustomOAuthUserService extends DefaultOAuth2UserService {
 		Role memberRole = roleRepository.findById(AppConstants.ROLE_MEMBER.longValue()).get();
 		userRole.setRole(memberRole);
 		userRoleRepository.save(userRole);
+		System.out.println("Load ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd");
 		return accountRepository.save(account);
 	}
 

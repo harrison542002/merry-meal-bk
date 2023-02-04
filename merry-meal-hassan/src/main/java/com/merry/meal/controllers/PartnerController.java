@@ -28,8 +28,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.merry.meal.config.AppConstants;
 import com.merry.meal.data.Meal;
 import com.merry.meal.payload.ApiResponse;
+import com.merry.meal.payload.DeliveryDto;
 import com.merry.meal.payload.MealDto;
 import com.merry.meal.payload.MealResponse;
+import com.merry.meal.services.DeliveryService;
 import com.merry.meal.services.FileService;
 import com.merry.meal.services.MealService;
 import com.merry.meal.utils.JwtUtils;
@@ -53,6 +55,9 @@ public class PartnerController {
 	
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	private DeliveryService deliveryService;
 
 	// add new meal
 	@PostMapping("/meals")
@@ -133,6 +138,32 @@ public class PartnerController {
 		InputStream resource = this.fileService.getResource(imageName);
 		response.setContentType(MediaType.IMAGE_JPEG_VALUE);
 		StreamUtils.copy(resource, response.getOutputStream());
+	}
+	
+	/**
+	 * Food Management
+	 */
+
+	// all deliveries
+	@GetMapping("/orders")
+	public ResponseEntity<List<DeliveryDto>> getAllOrderedMeals() {
+
+		List<DeliveryDto> orderedMeal = this.deliveryService.allOrders();
+
+		if (orderedMeal.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		return ResponseEntity.status(HttpStatus.OK).body(orderedMeal);
+	}
+
+	// particular delivery
+	@GetMapping("/orders/{deliveryId}")
+	public ResponseEntity<DeliveryDto> getParticularOrderedMeal(@PathVariable Long deliveryId) {
+
+		DeliveryDto orderedMeal = this.deliveryService.order(deliveryId);
+
+		return ResponseEntity.status(HttpStatus.OK).body(orderedMeal);
 	}
 
 }

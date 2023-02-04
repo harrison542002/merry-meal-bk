@@ -2,6 +2,7 @@ package com.merry.meal.controllers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,8 +29,10 @@ import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.merry.meal.data.Account;
 import com.merry.meal.data.User;
 import com.merry.meal.payload.ApiResponse;
+import com.merry.meal.payload.DeliveryDto;
 import com.merry.meal.payload.UserDto;
 import com.merry.meal.services.AccountService;
+import com.merry.meal.services.DeliveryService;
 import com.merry.meal.services.FileService;
 import com.merry.meal.services.UserService;
 import com.merry.meal.utils.JwtUtils;
@@ -50,12 +53,14 @@ public class UserController {
 	@Autowired
 	private AccountService accountService;
 
-	/// Changes ||||||||||||||||| changed accept by - HASSAN
 	@Autowired
 	private JwtUtils jwtUtils;
 	
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	private DeliveryService deliveryService;
 
 	// register local user
 	@PostMapping("/register")
@@ -132,6 +137,66 @@ public class UserController {
 		InputStream resource = this.fileService.getResource(imageName);
 		response.setContentType(MediaType.IMAGE_JPEG_VALUE);
 		StreamUtils.copy(resource, response.getOutputStream());
+	}
+	
+	/**
+	 * Food Management
+	 */
+
+	// user order meal
+	@PostMapping("/meals/{mealId}")
+	public ResponseEntity<DeliveryDto> orderMeal(@Valid @RequestBody DeliveryDto deliveryDto, @PathVariable Long mealId,
+			HttpServletRequest request) {
+
+		DeliveryDto orderedMeal = this.deliveryService.orderMeal(deliveryDto, mealId,
+				jwtUtils.getJWTFromRequest(request));
+
+		return new ResponseEntity<DeliveryDto>(orderedMeal, HttpStatus.CREATED);
+	}
+
+	// order status handling
+	@PutMapping("/meals/{deliveryId}")
+	public ResponseEntity<DeliveryDto> orderMeal(@PathVariable Long deliveryId, @RequestParam String status) {
+
+		DeliveryDto orderedMeal = this.deliveryService.orderMealStatus(deliveryId, status);
+
+		return new ResponseEntity<DeliveryDto>(orderedMeal, HttpStatus.OK);
+	}
+
+	// user all deliveries
+	@GetMapping("/meals")
+	public ResponseEntity<List<DeliveryDto>> getOrderedMeals(HttpServletRequest request) {
+
+		List<DeliveryDto> orderedMeal = this.deliveryService.userOrders(jwtUtils.getJWTFromRequest(request));
+
+		if (orderedMeal.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		return ResponseEntity.status(HttpStatus.OK).body(orderedMeal);
+	}
+
+	// rider confirm delivery
+	@PostMapping("/meals/confirm-orders/{deliveryId}")
+	public ResponseEntity<DeliveryDto> riderConfirmOrder(@PathVariable Long deliveryId, HttpServletRequest request) {
+
+		DeliveryDto orderedMeal = this.deliveryService.confirmOrderDelivery(deliveryId,
+				jwtUtils.getJWTFromRequest(request));
+
+		return new ResponseEntity<DeliveryDto>(orderedMeal, HttpStatus.CREATED);
+	}
+
+	// rider all deliveries
+	@GetMapping("/meals/confirm-orders")
+	public ResponseEntity<List<DeliveryDto>> getRiderConfirmOrders(HttpServletRequest request) {
+
+		List<DeliveryDto> orderedMeal = this.deliveryService.riderConfirmedOrders(jwtUtils.getJWTFromRequest(request));
+
+		if (orderedMeal.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+
+		return ResponseEntity.status(HttpStatus.OK).body(orderedMeal);
 	}
 
 }

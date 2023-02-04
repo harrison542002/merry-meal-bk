@@ -1,7 +1,5 @@
 package com.merry.meal.data;
 
-import java.util.List;
-
 import javax.annotation.Generated;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -11,37 +9,31 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "meal")
+@Table(name = "rider_delivery")
 @Getter
 @Setter
-public class Meal {
+@AllArgsConstructor
+@NoArgsConstructor
+public class RideDelivery {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "meal_id")
-	private Long mealId;
-	@Column(name = "meal_img")
-	private String image;
-	@Column(name = "status")
-	private String status;
-	@Column(name = "meal_name")
-	private String meal_name;
-	@Column(name = "meal_desc")
-	private String meal_desc;
-	@Column(name = "category")
-	private String category;
+	@Column(name = "rider_delivery_id")
+	private Long rider_delivery_id;
 	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", referencedColumnName = "user_id")
-	private User user;
-	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "meal")
-	private List<Delivery> delivery;
+	@JoinColumn(name = "rider_id", referencedColumnName = "user_id")
+	private User rider;
+	@OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+	@JoinColumn(name = "delivery_id", referencedColumnName = "delivery_id")
+	private Delivery delivery;
+
 }
