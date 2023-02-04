@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.merry.meal.data.Account;
+import com.merry.meal.data.User;
 import com.merry.meal.exceptions.ResourceNotFoundException;
 import com.merry.meal.payload.AccountDto;
 import com.merry.meal.repo.AccountRepo;
+import com.merry.meal.repo.UserRepository;
 import com.merry.meal.services.AccountService;
 import com.merry.meal.utils.JwtUtils;
 
@@ -22,6 +24,9 @@ public class AccountServiceImpl implements AccountService {
 
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	private UserRepository userRepo;
 
 	@Autowired
 	private JwtUtils jwtUtils;
@@ -45,6 +50,21 @@ public class AccountServiceImpl implements AccountService {
 				.orElseThrow(() -> new ResourceNotFoundException("account", "credentials", email));
 
 		return this.modelMapper.map(account, AccountDto.class);
+	}
+	
+	@Override
+	public Account getAccount(String token) {
+		String email = jwtUtils.getUserNameFromToken(token);
+		return accountRepo.findByEmail(email).get();
+	}
+	
+	@Override
+	public void deleteAccount(Long userId) {
+		User user = userRepo.findById(userId).get();
+		Account account = user.getAccount();
+		userRepo.delete(user);
+		accountRepo.delete(account);
+		return;
 	}
 
 }

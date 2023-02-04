@@ -96,4 +96,19 @@ public class UserServiceImpl implements UserService {
 		return userDto;
 	}
 
+	@Override
+	public UserDto editUserProfile(UserDto userDto, Long userId) {
+		Optional<User> user = userRepository.findById(userId);
+		if(user.isEmpty()) {
+			return null;
+		}
+		User editUser =this.modelMapper.map(userDto, User.class);
+		User realUser = user.get();
+		editUser.setAccount(realUser.getAccount());
+		editUser.setUser_id(realUser.getUser_id());
+		editUser = userRepository.save(editUser);
+		userDto = this.modelMapper.map(editUser, UserDto.class);
+		return userDto;
+	}
+
 }

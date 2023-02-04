@@ -19,5 +19,8 @@ public interface UserService {
 	User getUser(Long userId);
 	
 	List<UserDto> getUserProfiles();
+	
+	//edit user profile 
+	UserDto editUserProfile(UserDto userDto, Long userId);
 
 }

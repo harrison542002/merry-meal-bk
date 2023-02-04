@@ -7,11 +7,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +24,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+import com.merry.meal.data.Account;
+import com.merry.meal.data.User;
 import com.merry.meal.payload.ApiResponse;
 import com.merry.meal.payload.UserDto;
+import com.merry.meal.services.AccountService;
 import com.merry.meal.services.FileService;
 import com.merry.meal.services.UserService;
 import com.merry.meal.utils.JwtUtils;
@@ -40,10 +46,16 @@ public class UserController {
 
 	@Autowired
 	private FileService fileService;
+	
+	@Autowired
+	private AccountService accountService;
 
 	/// Changes ||||||||||||||||| changed accept by - HASSAN
 	@Autowired
 	private JwtUtils jwtUtils;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	// register local user
 	@PostMapping("/register")
@@ -51,6 +63,33 @@ public class UserController {
 
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(userService.createUserProfile(userDto, jwtUtils.getJWTFromRequest(request)));
+	}
+
+	// register local user
+	@PutMapping("/update/{userId}")
+	public ResponseEntity<UserDto> editUserProfile(
+			HttpServletRequest request, @Valid @RequestBody UserDto userDto,
+			@PathVariable Long userId) {
+
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(userService.editUserProfile(userDto, userId));
+	}
+	
+	// get personal user profile
+	@GetMapping("/profile")
+	public ResponseEntity<?> getPersonalProfile(HttpServletRequest request){
+		
+		String token =  jwtUtils.getJWTFromRequest(request);
+		Account account = accountService.getAccount(token);
+		User user = account.getUser();
+		return ResponseEntity.ok(this.modelMapper.map(user, UserDto.class));
+	}
+	
+	//delete user 
+	@DeleteMapping("/{uid}")
+	public ResponseEntity<?> deleteUser(@PathVariable Long uid){
+		accountService.deleteAccount(uid);
+		return ResponseEntity.ok("Account has been deleted successfully");
 	}
 
 	// uploading user profile image
@@ -70,10 +109,21 @@ public class UserController {
 				HttpStatus.OK);
 
 	}
-	//get user info to admin dashboard
-		@GetMapping("/")
-		public ResponseEntity<?> getUsers(){
-			return ResponseEntity.ok(userService.getUserProfiles());
+
+	// get user info to admin dashboard
+	@GetMapping("/")
+	public ResponseEntity<?> getUsers() {
+		return ResponseEntity.ok(userService.getUserProfiles());
+	}
+	
+	//get Single user info
+	@GetMapping("/{userId}")
+	public ResponseEntity<?> getUser(@PathVariable Long userId) {
+		User user = userService.getUser(userId);
+		if(user == null) {
+			return ResponseEntity.badRequest().body("User with " + userId + " not found");
+		}
+		return ResponseEntity.ok(modelMapper.map(user, UserDto.class));
 	}
 
 	// method to serve user profile image
