@@ -156,9 +156,13 @@ public class UserController {
 
 	// order status handling
 	@PutMapping("/meals/{deliveryId}")
-	public ResponseEntity<DeliveryDto> orderMeal(@PathVariable Long deliveryId, @RequestParam String status) {
+	public ResponseEntity<DeliveryDto> orderMeal(
+			HttpServletRequest request ,@PathVariable Long deliveryId, @RequestParam String status) {
 
-		DeliveryDto orderedMeal = this.deliveryService.orderMealStatus(deliveryId, status);
+		String token = jwtUtils.getJWTFromRequest(request);
+		Account account = accountService.getAccount(token);
+		User user = account.getUser();
+		DeliveryDto orderedMeal = this.deliveryService.orderMealStatus(user,deliveryId, status);
 
 		return new ResponseEntity<DeliveryDto>(orderedMeal, HttpStatus.OK);
 	}

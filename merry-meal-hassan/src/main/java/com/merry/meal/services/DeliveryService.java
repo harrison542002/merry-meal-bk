@@ -2,6 +2,7 @@ package com.merry.meal.services;
 
 import java.util.List;
 
+import com.merry.meal.data.User;
 import com.merry.meal.payload.DeliveryDto;
 
 public interface DeliveryService {
@@ -10,7 +11,7 @@ public interface DeliveryService {
 	DeliveryDto orderMeal(DeliveryDto deliveryDto, Long mid, String token);
 
 	// order status handling
-	DeliveryDto orderMealStatus(Long deliveryId, String status);
+	DeliveryDto orderMealStatus(User user,Long deliveryId, String status);
 
 	// get user all orders
 	List<DeliveryDto> userOrders(String token);

@@ -71,11 +71,17 @@ public class DeliveryServiceImpl implements DeliveryService {
 	}
 
 	@Override
-	public DeliveryDto orderMealStatus(Long deliveryId, String status) {
+	public DeliveryDto orderMealStatus(User user, Long deliveryId, String status) {
 		Delivery delivery = this.deliveryRepository.findById(deliveryId)
 				.orElseThrow(() -> new ResourceNotFoundException("delivery", "delivery id", deliveryId.toString()));
 
 		delivery.setStatus(status);
+		if(status.equalsIgnoreCase("Order")) {
+			RideDelivery rideDelivery = new RideDelivery();
+			rideDelivery.setRider(user);
+			rideDelivery.setDelivery(delivery);
+			this.riderDeliveryRepo.save(rideDelivery);
+		}
 
 		Delivery changedStatus = this.deliveryRepository.save(delivery);
 
