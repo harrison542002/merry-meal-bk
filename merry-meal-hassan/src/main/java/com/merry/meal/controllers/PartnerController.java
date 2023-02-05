@@ -71,6 +71,7 @@ public class PartnerController {
 	@PutMapping("/meals")
 	public ResponseEntity<ApiResponse> updateAddedMeal(@Valid @RequestBody MealDto mealDto,
 			HttpServletRequest request) {
+		System.out.println(mealDto.getStatus());
 		this.mealService.updateAddedMeal(mealDto, jwtUtils.getJWTFromRequest(request));
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Meal updated successfully", true), HttpStatus.CREATED);
 	}
