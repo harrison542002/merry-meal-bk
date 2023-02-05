@@ -26,5 +26,10 @@ public interface DeliveryService {
 
 	// get rider all confirmed orders
 	List<DeliveryDto> riderConfirmedOrders(String token);
+	
+	//get pending orders
+	List<DeliveryDto> pendingDelivery();
+
+	void deleteDelivery(Long delivery);
 
 }

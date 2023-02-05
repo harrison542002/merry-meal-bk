@@ -31,7 +31,7 @@ public class Delivery {
 	@Column(name = "delivery_number")
 	private Integer delivery_number;
 	@Column(name = "delivery_status")
-	private String delivery_status;
+	private String status;
 	@Column(name = "delivery_address")
 	private String delivery_address;
 	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)

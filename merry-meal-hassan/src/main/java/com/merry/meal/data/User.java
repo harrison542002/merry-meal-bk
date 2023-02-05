@@ -55,4 +55,7 @@ public class User {
 	
 	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "rider")
 	private List<RideDelivery> rideDeliveries;
+	
+	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "user")
+	private List<Meal> meals;
 }

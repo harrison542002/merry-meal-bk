@@ -130,8 +130,9 @@ public class PartnerController {
 		this.mealService.uploadImage(image, mid);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Meal image uploaded successfully", true),
 				HttpStatus.OK);
-
 	}
+	
+
 
 	// method to serve meal image
 	@GetMapping(value = "/meals/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
@@ -165,6 +166,11 @@ public class PartnerController {
 		DeliveryDto orderedMeal = this.deliveryService.order(deliveryId);
 
 		return ResponseEntity.status(HttpStatus.OK).body(orderedMeal);
+	}
+	
+	@GetMapping(value="/meals/pending-delivery")
+	public ResponseEntity<List<DeliveryDto>> getPendingDelivery(){
+		return ResponseEntity.ok(this.deliveryService.pendingDelivery());
 	}
 
 }

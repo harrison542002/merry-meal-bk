@@ -76,9 +76,8 @@ public class WebAppConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/", "/meal", "/auth/**", "/oauth2/**").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/v1/partners/**").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/v1/users/image/**").permitAll()
-				.and()
-				.authorizeRequests()
-				.antMatchers("/admin/**").permitAll().anyRequest().authenticated().and().oauth2Login()
+				.antMatchers(HttpMethod.GET, "/api/v1/partners/meals/image/**").permitAll()
+				.anyRequest().authenticated().and().oauth2Login()
 				.successHandler(oAuth2SuccessHandler).failureHandler(oAuth2FailHandler)
 				.authorizationEndpoint().authorizationRequestResolver(authorizationRequestResolver());
 

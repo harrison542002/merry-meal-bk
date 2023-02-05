@@ -14,12 +14,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.merry.meal.data.Account;
+import com.merry.meal.data.Delivery;
 import com.merry.meal.data.Meal;
 import com.merry.meal.exceptions.ResourceNotFoundException;
 import com.merry.meal.payload.MealDto;
 import com.merry.meal.payload.MealResponse;
 import com.merry.meal.repo.AccountRepo;
+import com.merry.meal.repo.DeliveryRepository;
 import com.merry.meal.repo.MealRepository;
+import com.merry.meal.repo.RiderDeliveryRepo;
 import com.merry.meal.services.FileService;
 import com.merry.meal.services.MealService;
 import com.merry.meal.utils.JwtUtils;
@@ -35,6 +38,12 @@ public class MealServiceImpl implements MealService {
 
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	private DeliveryRepository deliveryRepository;
+	
+	@Autowired
+	private RiderDeliveryRepo riderDeliveryRepo;
 
 	@Autowired
 	private FileService fileService;
@@ -59,16 +68,22 @@ public class MealServiceImpl implements MealService {
 
 	@Override
 	public void deleteAddedMeal(Long mid) throws IOException {
-
+		
 		Meal meal = this.mealRepository.findById(mid)
 				.orElseThrow(() -> new ResourceNotFoundException("meal", "meal id", mid.toString()));
 
-		if (meal.getImage() != null) {
+		String image = meal.getImage();
+		List<Delivery> delivery = meal.getDelivery();
+		if (image != null) {
 			this.fileService.deleteFile(meal.getImage());
 		}
-
+		if(delivery != null) {
+			delivery.stream().forEach((deli) -> {
+				this.riderDeliveryRepo.delete(deli.getRideDelivery());
+				this.deliveryRepository.delete(deli);
+			});
+		}
 		this.mealRepository.delete(meal);
-
 	}
 
 	@Override

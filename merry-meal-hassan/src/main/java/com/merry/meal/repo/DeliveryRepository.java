@@ -10,5 +10,7 @@ import com.merry.meal.data.User;
 public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
 
 	List<Delivery> findByUser(User user);
+	
+	List<Delivery> findByStatus(String delivery_status);
 
 }

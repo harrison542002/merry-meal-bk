@@ -30,6 +30,9 @@ public class DeliveryServiceImpl implements DeliveryService {
 
 	@Autowired
 	private DeliveryRepository deliveryRepository;
+	
+	@Autowired
+	private RiderDeliveryRepo riderDeliveryRepo;
 
 	@Autowired
 	private AccountRepo accountRepo;
@@ -37,11 +40,12 @@ public class DeliveryServiceImpl implements DeliveryService {
 	@Autowired
 	private JwtUtils jwtUtils;
 	
-	@Autowired
-	private RiderDeliveryRepo riderDeliveryRepo;
+	
 
 	@Autowired
 	private ModelMapper modelMapper;
+	
+
 
 	@Override
 	public DeliveryDto orderMeal(DeliveryDto deliveryDto, Long mid, String token) {
@@ -56,7 +60,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 		Delivery delivery = this.modelMapper.map(deliveryDto, Delivery.class);
 
 		delivery.setDelivery_number((int) (Math.floor(Math.random() * (99999999 - 00000000)) + 00000000));
-		delivery.setDelivery_status("Pending");
+		delivery.setStatus("Pending");
 
 		delivery.setUser(account.getUser());
 		delivery.setMeal(meal);
@@ -71,7 +75,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 		Delivery delivery = this.deliveryRepository.findById(deliveryId)
 				.orElseThrow(() -> new ResourceNotFoundException("delivery", "delivery id", deliveryId.toString()));
 
-		delivery.setDelivery_status(status);
+		delivery.setStatus(status);
 
 		Delivery changedStatus = this.deliveryRepository.save(delivery);
 
@@ -141,6 +145,21 @@ public class DeliveryServiceImpl implements DeliveryService {
 			deliveryDto.add(this.modelMapper.map(delivery.getDelivery(), DeliveryDto.class));
 		});
 		return deliveryDto;
+	}
+
+	@Override
+	public List<DeliveryDto> pendingDelivery() {
+		List<DeliveryDto> deliveryDtos = this.deliveryRepository.findByStatus("PENDING")
+				.stream().map((delivery) -> this.modelMapper.map(delivery, DeliveryDto.class)).collect(Collectors.toList());
+		return deliveryDtos;
+	}
+	
+	@Override
+	public void deleteDelivery(Long deliveryId) {
+		Delivery delivery = deliveryRepository.findById(deliveryId).get();
+		this.riderDeliveryRepo.deleteByDelivery(delivery);
+		this.deliveryRepository.delete(delivery);
+		return;
 	}
 
 }

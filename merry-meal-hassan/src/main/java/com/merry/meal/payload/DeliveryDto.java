@@ -17,7 +17,7 @@ public class DeliveryDto {
 
 	private Integer delivery_number;
 
-	private String delivery_status;
+	private String status;
 
 	@NotEmpty(message = "Delivery address can't not be empty")
 	private String delivery_address;
@@ -25,4 +25,6 @@ public class DeliveryDto {
 	private UserDto user;
 
 	private MealDto meal;
+	
+	private RiderDeliveryDto riderDelivery;
 }
