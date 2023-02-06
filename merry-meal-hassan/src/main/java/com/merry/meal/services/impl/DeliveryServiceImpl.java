@@ -76,7 +76,10 @@ public class DeliveryServiceImpl implements DeliveryService {
 				.orElseThrow(() -> new ResourceNotFoundException("delivery", "delivery id", deliveryId.toString()));
 
 		delivery.setStatus(status);
-		if(status.equalsIgnoreCase("Order")) {
+		System.out.println(status);
+		System.out.println(status.equalsIgnoreCase("Order") + "/////////////////////////////////////////");
+		if(status.equalsIgnoreCase("Ordered")) {
+			System.out.println(status);
 			RideDelivery rideDelivery = new RideDelivery();
 			rideDelivery.setRider(user);
 			rideDelivery.setDelivery(delivery);

@@ -58,4 +58,13 @@ public class User {
 	
 	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "user")
 	private List<Meal> meals;
+	
+	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "user")
+	private List<CareMember> requestedCares;
+	
+	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, mappedBy = "caregiver")
+	private List<CareMember> acceptedCares;
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.MERGE)
+	private List<Session>session;
 }

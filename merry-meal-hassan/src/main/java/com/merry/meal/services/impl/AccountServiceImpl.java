@@ -9,12 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.merry.meal.data.Account;
+import com.merry.meal.data.CareMember;
 import com.merry.meal.data.Meal;
 import com.merry.meal.data.User;
+import com.merry.meal.data.UserRole;
 import com.merry.meal.exceptions.ResourceNotFoundException;
 import com.merry.meal.payload.AccountDto;
 import com.merry.meal.repo.AccountRepo;
+import com.merry.meal.repo.CareMemberRepository;
 import com.merry.meal.repo.UserRepository;
+import com.merry.meal.repo.UserRoleRepository;
 import com.merry.meal.services.AccountService;
 import com.merry.meal.services.MealService;
 import com.merry.meal.utils.JwtUtils;
@@ -36,6 +40,12 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Autowired
 	private MealService mealService;
+	
+	@Autowired
+	private UserRoleRepository userRoleRepository;
+	
+	@Autowired
+	private CareMemberRepository careMemberRepository;
 
 	@Override
 	public List<AccountDto> getAllAccountDto() {
@@ -77,7 +87,32 @@ public class AccountServiceImpl implements AccountService {
 				}
 			});
 		}
+		List<CareMember> requestCares = user.getRequestedCares();
+		if(requestCares != null) {
+			requestCares.stream().forEach((cares) -> {
+				careMemberRepository.delete(cares);
+			});
+			List<CareMember> reacceptedCares = user.getAcceptedCares();
+			if(reacceptedCares != null) {
+				reacceptedCares.stream().forEach((cares) -> {
+					careMemberRepository.delete(cares);
+				});
+			}
+		}
+		
+		List<CareMember> acceptedCares = user.getAcceptedCares();
+		if(acceptedCares != null) {
+			acceptedCares.stream().forEach((cares) -> {
+				careMemberRepository.delete(cares);
+			});
+		}
 		Account account = user.getAccount();
+		List<UserRole> userRoles = account.getUserRoles();
+		if(userRoles != null) {
+			userRoles.stream().forEach((role) -> {
+				userRoleRepository.delete(role);
+			});
+		}
 		userRepo.delete(user);
 		accountRepo.delete(account);
 		return;
