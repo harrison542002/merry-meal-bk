@@ -11,12 +11,14 @@ import org.springframework.stereotype.Service;
 import com.merry.meal.data.Account;
 import com.merry.meal.data.CareMember;
 import com.merry.meal.data.Meal;
+import com.merry.meal.data.Session;
 import com.merry.meal.data.User;
 import com.merry.meal.data.UserRole;
 import com.merry.meal.exceptions.ResourceNotFoundException;
 import com.merry.meal.payload.AccountDto;
 import com.merry.meal.repo.AccountRepo;
 import com.merry.meal.repo.CareMemberRepository;
+import com.merry.meal.repo.SessionRepository;
 import com.merry.meal.repo.UserRepository;
 import com.merry.meal.repo.UserRoleRepository;
 import com.merry.meal.services.AccountService;
@@ -46,6 +48,9 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Autowired
 	private CareMemberRepository careMemberRepository;
+	
+	@Autowired
+	private SessionRepository sessionRepository;
 
 	@Override
 	public List<AccountDto> getAllAccountDto() {
@@ -78,6 +83,12 @@ public class AccountServiceImpl implements AccountService {
 	public void deleteAccount(Long userId) {
 		User user = userRepo.findById(userId).get();
 		List<Meal> meals = user.getMeals();
+		List<Session> sessions = user.getSession();
+		if(sessions != null) {
+			sessions.forEach((session)-> {
+				sessionRepository.delete(session);
+			});
+		}
 		if(meals != null) {
 			meals.stream().forEach((meal)-> {
 				try {
